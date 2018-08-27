@@ -1,5 +1,10 @@
 require "bundler/setup"
+require "aws_config"
+require "aws_signing"
+require "aws_request"
 require "awis"
+require "ats"
+require "date"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
