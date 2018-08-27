@@ -1,5 +1,4 @@
-require "awis/version"
 
-module Awis
+module Aws
   # Your code goes here...
 end

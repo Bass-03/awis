@@ -1,11 +1,11 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "awis/version"
+require "aws/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "awis"
-  spec.version       = Awis::VERSION
+  spec.version       = Aws::VERSION
   spec.authors       = ["Edmundo Sanchez"]
   spec.email         = ["zomundo@gmail.com"]
 
@@ -31,6 +31,8 @@ Gem::Specification.new do |spec|
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
+
+  spec.add_dependency "nori", "2.6.0"
 
   spec.add_development_dependency "bundler", "~> 1.16"
   spec.add_development_dependency "rake", "~> 10.0"

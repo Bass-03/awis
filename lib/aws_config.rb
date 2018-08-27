@@ -1,5 +1,4 @@
-
-module Awis
+module Aws
   class AWS_config
     # Read the key and secret from the aws credentials file
     # file is normally on ~/.aws
