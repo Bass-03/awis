@@ -3,13 +3,24 @@ module Aws
     # Read the key and secret from the aws credentials file
     # file is normally on ~/.aws
     # ENV["aws"] overrides the location
-    def readFile
+    def read_keys
       if ENV["AWS"]
         path = ENV["AWS"]
       else
         path = "#{ENV["HOME"]}/.aws"
       end
-      puts File.read(path + "credentials")
+      keys = {}
+      file_text = File.read(path + "/credentials")
+      file_text.each_line do |line|
+        # skip line if is a section header
+        next if line.include? "[]"
+        # if line includes '=' then it is a variable
+        if line.include? "="
+          line = line.partition("=")
+          keys[line[0].strip.to_sym] = line[2].strip
+        end
+      end
+      return keys
     end
   end
 end
