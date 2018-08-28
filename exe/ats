@@ -1,0 +1,113 @@
+#!/usr/bin/env ruby
+require "bundler/setup"
+require "ats"
+require "utils"
+require "rubygems"
+require "commander/import"
+require "fileutils"
+require "date"
+require "json"
+
+
+# Get all information, store it in file system
+# format: folder name is a date and a possible 'label'
+# file name is the domain only, if the domain exists no call will be made to awis
+
+program :name, 'awis'
+program :version, '1.0.0'
+program :description, 'Get sinformation from Alexa Web Information Services'
+program :help_formatter, :compact
+
+command :top do |c|
+  c.syntax = 'awis info'
+  c.description = 'Gets data from UrlInfo action.'
+  c.option '-f FILE','--file FILE',String, 'Path to CSV holding domain, last column must be the country code'
+  c.option '-o PATH','--output PATH', String, 'Output directory'
+  c.option '-l LABEL','--label LABEL', String, 'Label to add to the output folder'
+  c.option '-c CODE','--country CODE', String, 'Valid country code. A global list of top sites is returned by default'
+  c.option '-s NUMBER','--start NUMBER', String,  'Number of result at which to start. Used for paging through results.'
+  c.option '-r NUMBER','--results NUMBER', String,  'Number of results (maximum) per page to return. Maximum is 100'
+  c.option '-x NUMBER','--top NUMBER', String,  'Total number of domains to get. top X sites'
+  c.action do |args, options|
+    if (options.file and options.country) or !options.output
+      puts "Set the correct options: file or country, and output path"
+      exit
+    end
+    options.default :country => false, :start => 1, :results => 100, :top => 100
+    # Create output directory
+    output_path = "#{options.output}/#{Date.today.to_s} top_sites"
+    output_path += " - #{options.label}/" if options.label
+    FileUtils.mkdir_p output_path unless Dir.exists?(output_path)
+    # open csv
+    csv_data = [["country_code"],[options.country]]
+    if options.file
+      csv_data = Aws::Utils.readCSV options.file
+    end
+    # Get AWIS data
+    awis = Aws::Ats.new
+    csv_data.each_with_index do |row,index|
+      next if index == 0
+      print " == #{row.last} ==" if row.last
+      print " == Global ==" if !row.last
+      #loop until top X data is obtained
+      top = options.top.to_i
+      start = options.start.to_i
+      total = 0
+      while total < top
+        print "\ntop #{total + options.results.to_i} ..."
+        if File.exist?(output_path + "/" + (row.last ? row.last : "Global") + " " + (total + options.results.to_i ).to_s) #skip domain if already have data
+          total += options.results
+          start = total + 1
+          print " already exist."
+          next
+        end
+        top_sites = awis.top_sites row.last,start.to_s,options.results
+        File.write(output_path + "/" + (row.last ? row.last : "Global") + " " + (total + options.results.to_i ).to_s, JSON.pretty_generate(top_sites))
+        total += options.results
+        start = total + 1
+        print "done"
+      end
+      puts "\n"
+    end
+  end
+end
+
+command :list do |c|
+  c.syntax = 'awis traffic'
+  c.description = 'Gets data from trafficHistory Action.'
+  c.option '-o PATH','--output PATH', String, 'Output directory'
+  c.option '-l LABEL','--label LABEL', String, 'Label to add to the output folder'
+  c.action do |args, options|
+    if !options.output
+      puts "Set all options: output path"
+    end
+    # Create output directory
+    output_path = "#{options.output}/#{Date.today.to_s} country_codes"
+    output_path += " - #{options.label}/" if options.label
+    FileUtils.mkdir_p output_path unless Dir.exists?(output_path)
+    # Get AWIS data
+    awis = Aws::Ats.new
+    country_codes = awis.list_countries
+    File.write(output_path + "/codes", JSON.pretty_generate(country_codes))
+    puts " done."
+  end
+end
+
+# REPORTS
+# top sites
+  # "DataUrl": "baidu.com",
+  # "Country": {
+  #   "Rank": "1",
+  #   "Reach": {
+  #     "PerMillion": "515300"
+  #   },
+  #   "PageViews": {
+  #     "PerMillion": "114400",
+  #     "PerUser": "5.68"
+  #   }
+  # },
+  # "Global": {
+  #   "Rank": "4"
+  # }
+
+#coutry list CSV with country name, total sites and code
