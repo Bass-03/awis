@@ -27,6 +27,7 @@ command :info do |c|
   c.action do |args, options|
     if !options.file or !options.output
       puts "Set all options: file and output path"
+      exit
     end
     # Create output directory
     output_path = "#{options.output}/#{Date.today.to_s} Url_Info"
@@ -39,12 +40,12 @@ command :info do |c|
     csv_data.each_with_index do |row,index|
       next if index == 0
       print "#{row.last} ..."
-      if File.exist?(output_path + row.last) #skip domain if already have data
+      if File.exist?(output_path + "/" + row.last) #skip domain if already have data
         puts " already exist."
         next
       end
       url_info = awis.url_info row.last
-      File.write(output_path + row.last, JSON.pretty_generate(url_info))
+      File.write(output_path + "/" + row.last, JSON.pretty_generate(url_info))
       puts " done."
     end
   end
