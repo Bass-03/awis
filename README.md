@@ -1,29 +1,72 @@
 # Awis
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/awis`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+A way to query Alexa's awis and ats services
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Clone this repo, install dependencies with `bundle install --path .bundle`
 
-```ruby
-gem 'awis'
+Can be installed as gem with
+``` bash
+bundle exec rake build
+gem install pkg/aiws-{version}.gem
 ```
 
-And then execute:
+## Requirements
+-   ruby 2.5.1
+-   commander 4.4.6
+-   nori 2.6.0
+-   bundler ~> 1.16
+-   rake ~> 10.0
+-   rspec ~> 3.0
 
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install awis
 
 ## Usage
+The respective executables save the results of the AWS service in individual files on the given output path.
+The intention is to be able to consult these results without needing to call AWS again.
 
-TODO: Write usage instructions here
+The report generation is based on those result files.
 
+There are two executable files
+
+### awis
+```
+awis
+
+Get sinformation from Alexa Web Information Services
+
+Commands:
+  help    Display global or [command] help documentation
+  info    Gets data from UrlInfo action.
+  traffic Gets data from trafficHistory Action.
+
+Global Options:
+  -h, --help           Display help documentation
+  -v, --version        Display version information
+  -t, --trace          Display backtrace when an error occurs
+```
+### ats
+
+```
+awis
+
+ats
+
+Get information from Alexa Top Sites
+
+Commands:
+  help       Display global or [command] help documentation
+  list       Gets data from trafficHistory Action.
+  top        Gets data from UrlInfo action.
+  top_report Prints report CSV to standard out
+
+Global Options:
+  -h, --help           Display help documentation
+  -v, --version        Display version information
+  -t, --trace          Display backtrace when an error occurs
+
+
+```
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
@@ -32,7 +75,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/awis. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub [on this repo](https://github.com/gdledsan/awis). This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
@@ -40,4 +83,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Awis project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/awis/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the Awis project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/gdledsan/awis/blob/master/CODE_OF_CONDUCT.md).

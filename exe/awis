@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require "bundler/setup"
+#require "bundler/setup"
 require "awis"
 require "utils"
 require "rubygems"
@@ -15,7 +15,7 @@ require "json"
 
 program :name, 'awis'
 program :version, '1.0.0'
-program :description, 'Get sinformation from Alexa Web Information Services'
+program :description, 'Get information from Alexa Web Information Services'
 program :help_formatter, :compact
 
 command :info do |c|
