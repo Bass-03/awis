@@ -80,6 +80,7 @@ command :list do |c|
   c.action do |args, options|
     if !options.output
       puts "Set all options: output path"
+      exit
     end
     # Create output directory
     output_path = "#{options.output}/#{Date.today.to_s} country_codes"
@@ -109,5 +110,45 @@ end
   # "Global": {
   #   "Rank": "4"
   # }
+  command :top_report do |c|
+    c.syntax = 'awis top_report'
+    c.description = 'Prints report CSV to standard out'
+    c.option '-d PATH','--data PATH', String, 'Path to files with data from ATS'
+    c.action do |args, options|
+      if !options.data
+        puts "Set all options: data path"
+        exit
+      end
+      if !Dir.exists?(options.data)
+        puts "Folder does not exist"
+      end
+      all_data = []
+      Dir.foreach(options.data) do |file|
+        next if file == '.' or file == '..'
+        top_data = File.read(options.data + "/" + file)
+        hash_data = JSON.parse(top_data,:symbolize_names => true)
+
+        all_data << hash_data.dig(:TopSitesResponse,:Response,:TopSitesResult,:Alexa,:TopSites,:Country)
+      end
+
+      # puts column names
+      puts '"Country_Name","Country_Code","domain","Global Rank","Country Rank","Reach","PageViews","PageVies Avg"'
+      #puts data
+      all_data.each do |data|
+        #loop sites
+        data.dig(:Sites,:Site).each do |site|
+          print '"' + data.dig(:CountryName) + '",'
+          print '"' + data.dig(:CountryCode) + '",'
+          print '"' + site.dig(:DataUrl) + '",'
+          print '"' + site.dig(:Global,:Rank) + '",'
+          print '"' + site.dig(:Country,:Rank) + '",'
+          print '"' + site.dig(:Country,:Reach,:PerMillion) + '",'
+          print '"' + site.dig(:Country,:PageViews,:PerMillion) + '",'
+          print '"' + site.dig(:Country,:PageViews,:PerUser) + '"'
+          print "\n"
+        end
+      end
+    end
+  end
 
 #coutry list CSV with country name, total sites and code
