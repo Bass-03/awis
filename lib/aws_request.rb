@@ -6,6 +6,9 @@ module Aws
   require "nori"
   class Request
     attr_reader :response
+    # Makes the request to service_name
+    # @param service_name [String] Service to call, could be awis or ats. Probably works with other services
+    # @param query [Hash] Query to make to service_name
     def initialize(service_name,query)
       @query = query
 
@@ -26,12 +29,14 @@ module Aws
       }
       @response = response
     end
-
+    # Presents request made as XML
+    # @return REXML::Document
     def xml
       xml  = REXML::Document.new( @response.body )
       return xml
     end
-
+    # Presents request made as Hash
+    # @return Hash
     def hash
       #use rexml and remove "aws:" from keys
       parser = Nori.new :parser => :rexml, :convert_tags_to => lambda { |tag| tag.gsub("aws:","").to_sym }

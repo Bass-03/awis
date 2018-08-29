@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require "bundler/setup"
+#require "bundler/setup"
 require "ats"
 require "utils"
 require "rubygems"
@@ -13,9 +13,9 @@ require "json"
 # format: folder name is a date and a possible 'label'
 # file name is the domain only, if the domain exists no call will be made to awis
 
-program :name, 'awis'
+program :name, 'ats'
 program :version, '1.0.0'
-program :description, 'Get sinformation from Alexa Web Information Services'
+program :description, 'Gets information from Alexa Top Sites'
 program :help_formatter, :compact
 
 command :top do |c|

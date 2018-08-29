@@ -6,6 +6,10 @@ module Aws
   class AWS_signing
     #Signing AWS Requests By Using Signature Version 4
     #http://docs.aws.amazon.com/general/latest/gr/sigv4_signing.html
+    # @param service_name [String] Service to call
+    # @param key [String] AWS key
+    # @param secret [String] AWS secret key
+    # @param query [hash] query data
     def initialize(service_name,key,secret,query)
       @service_name = service_name
       @key = key
@@ -13,6 +17,8 @@ module Aws
       @query = query
     end
 
+    # Signs request to aws with signing v4
+    # @return Hash with uri, timestamp and auth header
     def authorization_header
       service_host = "#{@service_name}.amazonaws.com"
       service_endpoint = "#{@service_name}.us-west-1.amazonaws.com"
