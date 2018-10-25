@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-#require "bundler/setup"
+require "bundler/setup"
 require "ats"
 require "utils"
 require "rubygems"
@@ -19,7 +19,7 @@ program :description, 'Gets information from Alexa Top Sites'
 program :help_formatter, :compact
 
 command :top do |c|
-  c.syntax = 'awis info'
+  c.syntax = 'ats top'
   c.description = 'Gets data from UrlInfo action.'
   c.option '-f FILE','--file FILE',String, 'Path to CSV holding domain, last column must be the country code'
   c.option '-o PATH','--output PATH', String, 'Output directory'
@@ -73,7 +73,7 @@ command :top do |c|
 end
 
 command :list do |c|
-  c.syntax = 'awis traffic'
+  c.syntax = 'ats list'
   c.description = 'Gets data from trafficHistory Action.'
   c.option '-o PATH','--output PATH', String, 'Output directory'
   c.option '-l LABEL','--label LABEL', String, 'Label to add to the output folder'
@@ -111,7 +111,7 @@ end
   #   "Rank": "4"
   # }
   command :top_report do |c|
-    c.syntax = 'awis top_report'
+    c.syntax = 'ats top_report'
     c.description = 'Prints report CSV to standard out'
     c.option '-d PATH','--data PATH', String, 'Path to files with data from ATS'
     c.action do |args, options|
@@ -121,6 +121,7 @@ end
       end
       if !Dir.exists?(options.data)
         puts "Folder does not exist"
+        exit
       end
       all_data = []
       Dir.foreach(options.data) do |file|
@@ -140,11 +141,11 @@ end
           print '"' + data.dig(:CountryName) + '",'
           print '"' + data.dig(:CountryCode) + '",'
           print '"' + site.dig(:DataUrl) + '",'
-          print '"' + site.dig(:Global,:Rank) + '",'
-          print '"' + site.dig(:Country,:Rank) + '",'
-          print '"' + site.dig(:Country,:Reach,:PerMillion) + '",'
-          print '"' + site.dig(:Country,:PageViews,:PerMillion) + '",'
-          print '"' + site.dig(:Country,:PageViews,:PerUser) + '"'
+          print '' + site.dig(:Global,:Rank) + ','
+          print '' + site.dig(:Country,:Rank) + ','
+          print '' + site.dig(:Country,:Reach,:PerMillion) + ','
+          print '' + site.dig(:Country,:PageViews,:PerMillion) + ','
+          print '' + site.dig(:Country,:PageViews,:PerUser) + ''
           print "\n"
         end
       end
