@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-#require "bundler/setup"
+require "bundler/setup"
 require "awis"
 require "utils"
 require "rubygems"
@@ -7,7 +7,6 @@ require "commander/import"
 require "fileutils"
 require "date"
 require "json"
-
 
 # Get all information, store it in file system
 # format: folder name is a date and a possible 'label'
@@ -75,12 +74,12 @@ command :traffic do |c|
     csv_data.each_with_index do |row,index|
       next if index == 0
       print "#{row.last} ..."
-      if File.exist?(output_path + row.last) #skip domain if already have data
+      if File.exist?(output_path + "/" +  row.last) #skip domain if already have data
         puts " already exist."
         next
       end
       url_info = awis.traffic_history row.last, options.start, options.range
-      File.write(output_path + row.last, JSON.pretty_generate(url_info))
+      File.write(output_path + "/" + row.last, JSON.pretty_generate(url_info))
       puts " done."
     end
   end
@@ -101,3 +100,50 @@ end
 
 #aws = Aws::Awis.new
 #puts aws.url_info("eyeo.com","Rank")
+
+# traffic report
+command :traffic_report do |c|
+  c.syntax = 'awis traffic_report'
+  c.description = 'Prints report CSV to standard out'
+  c.option '-d PATH','--data PATH', String, 'Path to files with data from AWIS'
+  c.action do |args, options|
+    if !options.data
+      puts "Set option: data path"
+      exit
+    end
+    if !Dir.exists?(options.data)
+      puts "Folder does not exist"
+      exit
+    end
+    # agregate all files recursively
+    all_data = Aws::Utils.agregate(options.data)
+    # puts column names
+    puts '"domain","date","Visits","PageViews","Rank","Reach"'
+    #puts data
+    all_data.each do |data|
+      traffic_history = data.dig(:TrafficHistoryResponse,:Response,:TrafficHistoryResult,:Alexa,:TrafficHistory)
+      #loop sites
+      historicalData = traffic_history.dig(:HistoricalData,:Data)
+      next if !historicalData
+      if historicalData.class == Hash
+        print '"' + traffic_history.dig(:Site).to_s + '",'
+        print '"' + historicalData.dig(:Date).to_s + '",'
+        print '"' + historicalData.dig(:PageViews,:PerMillion).to_s + '",'
+        print '"' + historicalData.dig(:PageViews,:PerUser).to_s + '",'
+        print '"' + historicalData.dig(:Rank).to_s + '",'
+        print '"' + historicalData.dig(:Reach,:PerMillion).to_s + '",'
+        print "\n"
+      else
+        historicalData.each do |site|
+          print '"' + traffic_history.dig(:Site).to_s + '",'
+          print '"' + site.dig(:Date).to_s + '",'
+          print '"' + site.dig(:PageViews,:PerMillion).to_s + '",'
+          print '"' + site.dig(:PageViews,:PerUser).to_s + '",'
+          print '"' + site.dig(:Rank).to_s + '",'
+          print '"' + site.dig(:Reach,:PerMillion).to_s + '",'
+          print "\n"
+        end
+      end
+    end
+  end
+end
